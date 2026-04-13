@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alta de Producto - CellStore</title>
+</head>
+<body>
+    <header>
+        <h1>CellStore</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#">Productos</a></li>
+                <li><a href="#">Ofertas</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="alta-producto.html">Alta Producto</a></li>
+                <li><a href="#">Carrito (0)</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Alta de Nuevo Producto</h2>
+            <p>Completa el formulario para registrar un nuevo producto en el catálogo.</p>
+        </section>
+
+        <section>
+            <h3>Información del Producto</h3>
+            <form action="#" method="POST">
+                <p>
+                    <label for="nombre">Nombre del Producto:</label><br>
+                    <input type="text" id="nombre" name="nombre" required>
+                </p>
+                <p>
+                    <label for="marca">Marca:</label><br>
+                    <select id="marca" name="marca" required>
+                        <option value="">Selecciona una marca</option>
+                        <option value="apple">Apple</option>
+                        <option value="samsung">Samsung</option>
+                        <option value="google">Google</option>
+                        <option value="motorola">Motorola</option>
+                        <option value="xiaomi">Xiaomi</option>
+                        <option value="huawei">Huawei</option>
+                        <option value="oneplus">OnePlus</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </p>
+                <p>
+                    <label for="modelo">Modelo:</label><br>
+                    <input type="text" id="modelo" name="modelo" required>
+                </p>
+                <p>
+                    <label for="precio">Precio ($):</label><br>
+                    <input type="number" id="precio" name="precio" min="0" step="0.01" required>
+                </p>
+                <p>
+                    <label for="almacenamiento">Almacenamiento:</label><br>
+                    <select id="almacenamiento" name="almacenamiento" required>
+                        <option value="">Selecciona capacidad</option>
+                        <option value="64gb">64 GB</option>
+                        <option value="128gb">128 GB</option>
+                        <option value="256gb">256 GB</option>
+                        <option value="512gb">512 GB</option>
+                        <option value="1tb">1 TB</option>
+                    </select>
+                </p>
+                <p>
+                    <label for="color">Color:</label><br>
+                    <input type="text" id="color" name="color" required>
+                </p>
+                <p>
+                    <label for="pantalla">Tamaño de Pantalla:</label><br>
+                    <input type="text" id="pantalla" name="pantalla" placeholder="Ej: 6.1 pulgadas" required>
+                </p>
+                <p>
+                    <label for="stock">Cantidad en Stock:</label><br>
+                    <input type="number" id="stock" name="stock" min="0" required>
+                </p>
+                <p>
+                    <label for="descripcion">Descripción:</label><br>
+                    <textarea id="descripcion" name="descripcion" rows="4" cols="40" required></textarea>
+                </p>
+                <p>
+                    <label for="imagen">URL de Imagen:</label><br>
+                    <input type="url" id="imagen" name="imagen" placeholder="https://ejemplo.com/imagen.jpg">
+                </p>
+                <p>
+                    <input type="checkbox" id="oferta" name="oferta">
+                    <label for="oferta">Marcar como producto en oferta</label>
+                </p>
+                <p>
+                    <label for="precio-oferta">Precio de Oferta (si aplica):</label><br>
+                    <input type="number" id="precio-oferta" name="precio-oferta" min="0" step="0.01">
+                </p>
+                <p>
+                    <button type="submit">Registrar Producto</button>
+                    <button type="reset">Limpiar Formulario</button>
+                </p>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>Contactos: info@cellstore.com | Tel: 123-456-7890</p>
+        <p>Dirección: Calle Principal #123, Ciudad</p>
+        <p>&copy; 2026 CellStore. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

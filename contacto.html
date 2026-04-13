@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - CellStore</title>
+</head>
+<body>
+    <header>
+        <h1>CellStore</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="#">Productos</a></li>
+                <li><a href="#">Ofertas</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+                <li><a href="alta-producto.html">Alta Producto</a></li>
+                <li><a href="#">Carrito (0)</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Contáctanos</h2>
+            <p>¿Tienes alguna pregunta o necesitas ayuda? Estamos aquí para ti.</p>
+        </section>
+
+        <section>
+            <h3>Formulario de Contacto</h3>
+            <form action="#" method="POST">
+                <p>
+                    <label for="nombre">Nombre:</label><br>
+                    <input type="text" id="nombre" name="nombre" required>
+                </p>
+                <p>
+                    <label for="email">Correo Electrónico:</label><br>
+                    <input type="email" id="email" name="email" required>
+                </p>
+                <p>
+                    <label for="telefono">Teléfono:</label><br>
+                    <input type="tel" id="telefono" name="telefono">
+                </p>
+                <p>
+                    <label for="asunto">Asunto:</label><br>
+                    <select id="asunto" name="asunto">
+                        <option value="">Selecciona una opción</option>
+                        <option value="consulta">Consulta general</option>
+                        <option value="pedido">Seguimiento de pedido</option>
+                        <option value="garantia">Garantía</option>
+                        <option value="soporte">Soporte técnico</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </p>
+                <p>
+                    <label for="mensaje">Mensaje:</label><br>
+                    <textarea id="mensaje" name="mensaje" rows="5" cols="40" required></textarea>
+                </p>
+                <p>
+                    <button type="submit">Enviar Mensaje</button>
+                    <button type="reset">Limpiar</button>
+                </p>
+            </form>
+        </section>
+
+        <section>
+            <h3>Información de Contacto</h3>
+            <p><strong>Email:</strong> info@cellstore.com</p>
+            <p><strong>Teléfono:</strong> 123-456-7890</p>
+            <p><strong>Dirección:</strong> Calle Principal #123, Ciudad</p>
+            <p><strong>Horario:</strong> Lunes a Viernes, 9:00 AM - 6:00 PM</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Contactos: info@cellstore.com | Tel: 123-456-7890</p>
+        <p>Dirección: Calle Principal #123, Ciudad</p>
+        <p>&copy; 2026 CellStore. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
