@@ -7,18 +7,34 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>CellStore</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="#">Productos</a></li>
-                <li><a href="#">Ofertas</a></li>
-                <li><a href="contacto.html">Contacto</a></li>
-                <li><a href="alta-producto.html">Alta Producto</a></li>
-                <li><a href="#">Carrito (0)</a></li>
-            </ul>
-        </nav>
+    <header class="" >
+        <div class="nav-container">
+       <div class=" nav-logo ">
+            <div class="" >
+              <h1>CellStore</h1>
+           </div>  
+        </div>
+     
+        
+        <div class="header-nav ">
+            <nav class=" nav">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#">Productos</a></li>
+                    <li><a href="#">Ofertas</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="alta-producto.html">Alta Producto</a></li>
+                    <li><a href="#">Carrito (0)</a></li>
+                </ul>
+                  <div class="search-container">
+                <input type="search" placeholder="Buscar productos...">
+                <button type="button">Buscar</button>
+            </div>
+            </nav>
+          
+        </div>
+        </div>
+     
     </header>
 
     <main>
@@ -27,35 +43,38 @@
             <p>Tu tienda online de celulares con los mejores precios del mercado.</p>
         </section>
 
-        <section>
+<section>
             <h2>Productos Destacados</h2>
-            <article>
-                <h3>iPhone 15 Pro</h3>
-                <p>Precio: $999</p>
-                <p>Apple, 256GB, Pantalla 6.1"</p>
-                <button>Agregar al carrito</button>
-            </article>
-            <br>
-            <article>
-                <h3>Samsung Galaxy S24</h3>
-                <p>Precio: $899</p>
-                <p>Samsung, 128GB, Pantalla 6.2"</p>
-                <button>Agregar al carrito</button>
-            </article>
-            <br>
-            <article>
-                <h3>Google Pixel 8</h3>
-                <p>Precio: $699</p>
-                <p>Google, 128GB, Pantalla 6.3"</p>
-                <button>Agregar al carrito</button>
-            </article>
-            <br>
-            <article>
-                <h3>Motorola Edge 40</h3>
-                <p>Precio: $499</p>
-                <p>Motorola, 256GB, Pantalla 6.5"</p>
-                <button>Agregar al carrito</button>
-            </article>
+            <div class="productos-grid">
+                <article class="producto-card">
+                    <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="iPhone 15 Pro" width="200">
+                    <h3>iPhone 15 Pro</h3>
+                    <p class="precio">$999</p>
+                    <p>Apple, 256GB, Pantalla 6.1"</p>
+                    <button>Agregar al carrito</button>
+                </article>
+                <article class="producto-card">
+                    <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Samsung Galaxy S24" width="200">
+                    <h3>Samsung Galaxy S24</h3>
+                    <p class="precio">$899</p>
+                    <p>Samsung, 128GB, Pantalla 6.2"</p>
+                    <button>Agregar al carrito</button>
+                </article>
+                <article class="producto-card">
+                    <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Google Pixel 8" width="200">
+                    <h3>Google Pixel 8</h3>
+                    <p class="precio">$699</p>
+                    <p>Google, 128GB, Pantalla 6.3"</p>
+                    <button>Agregar al carrito</button>
+                </article>
+                <article class="producto-card">
+                    <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Motorola Edge 40" width="200">
+                    <h3>Motorola Edge 40</h3>
+                    <p class="precio">$499</p>
+                    <p>Motorola, 256GB, Pantalla 6.5"</p>
+                    <button>Agregar al carrito</button>
+                </article>
+            </div>
         </section>
 
         <section>
