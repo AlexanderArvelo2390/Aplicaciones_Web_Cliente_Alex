@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - CellStore</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>CellStore</h1>
+                <button class="menu-toggle" aria-label="Abrir menú" onclick="toggleMenu()">☰</button>
+            </div>
+            <div class="header-nav" id="mainNav">
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Inicio</a></li>
+                        <li><a href="#">Productos</a></li>
+                        <li><a href="#">Ofertas</a></li>
+                        <li><a href="contacto.html">Contacto</a></li>
+                        
+                        <li><a href="carrito.html" class="cart-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                            Carrito <span id="cart-count">(0)</span>
+                        </a></li>
+                        <li><a href="login.html" class="login-nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Admin
+                        </a></li>
+                    </ul>
+                </nav>
+                <div class="search-container">
+                    <input type="search" placeholder="Buscar productos...">
+                    <button type="button">Buscar</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Tu Carrito de Compras</h2>
+            <div id="cart-content"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Contactos: info@cellstore.com | Tel: 123-456-7890</p>
+        <p>Dirección: Calle Principal #123, Ciudad</p>
+        <p>&copy; 2026 CellStore. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('mainNav').classList.toggle('active');
+        }
+
+        function getCart() {
+            return JSON.parse(localStorage.getItem('cellstore_cart') || '[]');
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('cellstore_cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const cart = getCart();
+            const total = cart.reduce((sum, item) => sum + item.qty, 0);
+            const countEl = document.getElementById('cart-count');
+            if (countEl) {
+                countEl.textContent = `(${total})`;
+            }
+        }
+
+        function parsePrice(priceStr) {
+            return parseFloat(priceStr.replace(/[$,]/g, '')) || 0;
+        }
+
+        function formatPrice(num) {
+            return '$' + num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function changeQty(index, delta) {
+            const cart = getCart();
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            saveCart(cart);
+            renderCart();
+        }
+
+        function removeItem(index) {
+            const cart = getCart();
+            cart.splice(index, 1);
+            saveCart(cart);
+            renderCart();
+        }
+
+        function clearCart() {
+            if (confirm('¿Estás seguro de vaciar el carrito?')) {
+                localStorage.removeItem('cellstore_cart');
+                updateCartCount();
+                renderCart();
+            }
+        }
+
+        function renderCart() {
+            const cart = getCart();
+            const content = document.getElementById('cart-content');
+
+            if (cart.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                        <p>Tu carrito está vacío</p>
+                        <a href="index.html">Ir a comprar productos</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let subtotal = 0;
+            let rows = '';
+
+            cart.forEach((item, index) => {
+                const price = parsePrice(item.price);
+                const itemTotal = price * item.qty;
+                subtotal += itemTotal;
+
+                rows += `
+                    <tr>
+                        <td><img src="${item.img}" alt="${item.name}"></td>
+                        <td>
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-details">${item.details}</div>
+                        </td>
+                        <td>${item.price}</td>
+                        <td>
+                            <div class="qty-controls">
+                                <button onclick="changeQty(${index}, -1)">−</button>
+                                <span>${item.qty}</span>
+                                <button onclick="changeQty(${index}, 1)">+</button>
+                            </div>
+                        </td>
+                        <td><strong>${formatPrice(itemTotal)}</strong></td>
+                        <td><button class="remove-btn" onclick="removeItem(${index})">Eliminar</button></td>
+                    </tr>
+                `;
+            });
+
+            const tax = subtotal * 0.21;
+            const total = subtotal + tax;
+
+            content.innerHTML = `
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                </table>
+                <div class="cart-summary">
+                    <p>Subtotal: <strong>${formatPrice(subtotal)}</strong></p>
+                    <p>IVA (21%): <strong>${formatPrice(tax)}</strong></p>
+                    <p class="total">Total: <strong>${formatPrice(total)}</strong></p>
+                    <button onclick="alert('¡Compra realizada con éxito!')">Finalizar Compra</button>
+                    <button class="clear-cart-btn" onclick="clearCart()">Vaciar Carrito</button>
+                </div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            renderCart();
+        });
+    </script>
+</body>
+</html>

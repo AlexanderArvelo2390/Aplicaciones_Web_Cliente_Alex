@@ -13,18 +13,24 @@
             <div class="" >
               <h1>CellStore</h1>
            </div>  
-        </div>
-     
+            <button class="menu-toggle" aria-label="Abrir menú" onclick="toggleMenu()">☰</button>
+         </div>
+      
         
-        <div class="header-nav ">
+        <div class="header-nav" id="mainNav">
             <nav class=" nav">
                 <ul>
                     <li><a href="index.html">Inicio</a></li>
-                    <li><a href="#">Productos</a></li>
-                    <li><a href="#">Ofertas</a></li>
                     <li><a href="contacto.html">Contacto</a></li>
-                    <li><a href="alta-producto.html">Alta Producto</a></li>
-                    <li><a href="#">Carrito (0)</a></li>
+                    
+                    <li><a href="carrito.html" class="cart-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                        Carrito <span id="cart-count">(0)</span>
+                    </a></li>
+                    <li><a href="login.html" class="login-nav-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        Admin
+                    </a></li>
                 </ul>
                   <div class="search-container">
                 <input type="search" placeholder="Buscar productos...">
@@ -46,34 +52,54 @@
 <section>
             <h2>Productos Destacados</h2>
             <div class="productos-grid">
-                <article class="producto-card">
+                <a href="producto.html" class="producto-card">
                     <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="iPhone 15 Pro" width="200">
                     <h3>iPhone 15 Pro</h3>
                     <p class="precio">$999</p>
                     <p>Apple, 256GB, Pantalla 6.1"</p>
                     <button>Agregar al carrito</button>
-                </article>
-                <article class="producto-card">
+                </a>
+                <a href="producto.html" class="producto-card">
                     <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Samsung Galaxy S24" width="200">
                     <h3>Samsung Galaxy S24</h3>
                     <p class="precio">$899</p>
                     <p>Samsung, 128GB, Pantalla 6.2"</p>
                     <button>Agregar al carrito</button>
-                </article>
-                <article class="producto-card">
+                </a>
+                <a href="producto.html" class="producto-card">
                     <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Google Pixel 8" width="200">
                     <h3>Google Pixel 8</h3>
                     <p class="precio">$699</p>
                     <p>Google, 128GB, Pantalla 6.3"</p>
                     <button>Agregar al carrito</button>
-                </article>
-                <article class="producto-card">
+                </a>
+                <a href="producto.html" class="producto-card">
                     <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Motorola Edge 40" width="200">
                     <h3>Motorola Edge 40</h3>
                     <p class="precio">$499</p>
                     <p>Motorola, 256GB, Pantalla 6.5"</p>
                     <button>Agregar al carrito</button>
-                </article>
+                </a>   <a href="producto.html" class="producto-card">
+                    <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Motorola Edge 40" width="200">
+                    <h3>Motorola Edge 40</h3>
+                    <p class="precio">$499</p>
+                    <p>Motorola, 256GB, Pantalla 6.5"</p>
+                    <button>Agregar al carrito</button>
+                </a>
+                   <a href="producto.html" class="producto-card">
+                    <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Motorola Edge 40" width="200">
+                    <h3>Motorola Edge 40</h3>
+                    <p class="precio">$499</p>
+                    <p>Motorola, 256GB, Pantalla 6.5"</p>
+                    <button>Agregar al carrito</button>
+                </a>
+                   <a href="producto.html" class="producto-card">
+                    <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Motorola Edge 40" width="200">
+                    <h3>Motorola Edge 40</h3>
+                    <p class="precio">$499</p>
+                    <p>Motorola, 256GB, Pantalla 6.5"</p>
+                    <button>Agregar al carrito</button>
+                </a>
             </div>
         </section>
 
@@ -89,5 +115,63 @@
         <p>Direccion: Calle Principal #123, Ciudad</p>
         <p>&copy; 2026 CellStore. Todos los derechos reservados.</p>
     </footer>
+    <script>
+        function toggleMenu() {
+            document.getElementById('mainNav').classList.toggle('active');
+        }
+
+        function getCart() {
+            return JSON.parse(localStorage.getItem('cellstore_cart') || '[]');
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('cellstore_cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const cart = getCart();
+            const total = cart.reduce((sum, item) => sum + item.qty, 0);
+            const countEl = document.getElementById('cart-count');
+            if (countEl) {
+                countEl.textContent = `(${total})`;
+            }
+        }
+
+        function addToCart(name, price, details, img) {
+            const cart = getCart();
+            const existing = cart.find(item => item.name === name);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ name, price, details, img, qty: 1 });
+            }
+            saveCart(cart);
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Agregado';
+            btn.style.backgroundColor = '#27ae60';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.backgroundColor = '';
+            }, 1500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            document.querySelectorAll('.producto-card button').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const card = this.closest('.producto-card');
+                    const name = card.querySelector('h3').textContent;
+                    const price = card.querySelector('.precio').textContent;
+                    const details = card.querySelectorAll('p')[1]?.textContent || '';
+                    const img = card.querySelector('img').src;
+                    addToCart(name, price, details, img);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
