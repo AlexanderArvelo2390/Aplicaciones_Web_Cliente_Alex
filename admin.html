@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - CellStore</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="admin-header">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>CellStore <span class="admin-badge">Admin</span></h1>
+                <button class="menu-toggle" aria-label="Abrir menú" onclick="toggleMenu()">☰</button>
+            </div>
+            <div class="header-nav" id="mainNav">
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Ver Tienda</a></li>
+                        <li><a href="admin.html" class="active">Panel Admin</a></li>
+                        <li><a href="#" onclick="handleLogout()" class="logout-link">Cerrar Sesión</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="admin-layout">
+            <aside class="admin-sidebar">
+                <nav class="admin-nav">
+                    <button class="admin-nav-btn active" onclick="showSection('products')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        Productos
+                    </button>
+                    <button class="admin-nav-btn" onclick="showSection('add-product')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                        Agregar Producto
+                    </button>
+                    <button class="admin-nav-btn" onclick="showSection('orders')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        Pedidos
+                    </button>
+                    <button class="admin-nav-btn" onclick="showSection('settings')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        Configuración
+                    </button>
+                </nav>
+            </aside>
+
+            <div class="admin-content">
+                <div class="section" id="section-products">
+                    <div class="section-header">
+                        <h2>Gestión de Productos</h2>
+                        <button class="btn-primary" onclick="showSection('add-product')">+ Nuevo Producto</button>
+                    </div>
+                    <div class="admin-search">
+                        <input type="search" id="searchProducts" placeholder="Buscar productos..." oninput="filterProducts()">
+                    </div>
+                    <div class="products-table-container">
+                        <table class="admin-table" id="productsTable">
+                            <thead>
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Nombre</th>
+                                    <th>Marca</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section hidden" id="section-add-product">
+                    <div class="section-header">
+                        <h2 id="formTitle">Agregar Nuevo Producto</h2>
+                    </div>
+                    <form id="productForm" class="admin-form" onsubmit="saveProduct(event)">
+                        <input type="hidden" id="editIndex" value="-1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="prodNombre">Nombre del Producto</label>
+                                <input type="text" id="prodNombre" required placeholder="Ej: iPhone 15 Pro">
+                            </div>
+                            <div class="form-group">
+                                <label for="prodMarca">Marca</label>
+                                <select id="prodMarca" required>
+                                    <option value="">Selecciona una marca</option>
+                                    <option value="Apple">Apple</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="Google">Google</option>
+                                    <option value="Motorola">Motorola</option>
+                                    <option value="Xiaomi">Xiaomi</option>
+                                    <option value="Huawei">Huawei</option>
+                                    <option value="OnePlus">OnePlus</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="prodPrecio">Precio ($)</label>
+                                <input type="number" id="prodPrecio" required min="0" step="0.01" placeholder="999.99">
+                            </div>
+                            <div class="form-group">
+                                <label for="prodStock">Stock</label>
+                                <input type="number" id="prodStock" required min="0" placeholder="50">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="prodAlmacenamiento">Almacenamiento</label>
+                                <select id="prodAlmacenamiento" required>
+                                    <option value="">Selecciona</option>
+                                    <option value="64 GB">64 GB</option>
+                                    <option value="128 GB">128 GB</option>
+                                    <option value="256 GB">256 GB</option>
+                                    <option value="512 GB">512 GB</option>
+                                    <option value="1 TB">1 TB</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="prodPantalla">Tamaño de Pantalla</label>
+                                <input type="text" id="prodPantalla" required placeholder="Ej: 6.1 pulgadas">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="prodColor">Color</label>
+                                <input type="text" id="prodColor" required placeholder="Ej: Negro">
+                            </div>
+                            <div class="form-group">
+                                <label for="prodImagen">URL de Imagen</label>
+                                <input type="url" id="prodImagen" placeholder="https://ejemplo.com/imagen.jpg">
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="prodDescripcion">Descripción</label>
+                            <textarea id="prodDescripcion" rows="4" required placeholder="Descripción del producto..."></textarea>
+                        </div>
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="prodOferta"> Producto en oferta
+                            </label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Guardar Producto</button>
+                            <button type="button" class="btn-secondary" onclick="resetForm()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="section hidden" id="section-orders">
+                    <h2>Pedidos</h2>
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        <p>No hay pedidos registrados</p>
+                    </div>
+                </div>
+
+                <div class="section hidden" id="section-settings">
+                    <h2>Configuración</h2>
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        <p>Configuración del sistema próximamente</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Contactos: info@cellstore.com | Tel: 123-456-7890</p>
+        <p>Dirección: Calle Principal #123, Ciudad</p>
+        <p>&copy; 2026 CellStore. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('mainNav').classList.toggle('active');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('cellstore_admin');
+            window.location.href = 'login.html';
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('section-' + sectionId).classList.remove('hidden');
+            document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.closest('.admin-nav-btn').classList.add('active');
+        }
+
+        function getDefaultProducts() {
+            return [
+                { nombre: 'iPhone 15 Pro', marca: 'Apple', precio: 999, stock: 25, almacenamiento: '256 GB', pantalla: '6.1"', color: 'Negro', imagen: 'https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png', descripcion: 'El último iPhone con chip A17 Pro y cámara de 48MP.', oferta: false },
+                { nombre: 'Samsung Galaxy S24', marca: 'Samsung', precio: 899, stock: 30, almacenamiento: '128 GB', pantalla: '6.2"', color: 'Verde', imagen: 'https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png', descripcion: 'Smartphone premium con cámara de 50MP.', oferta: true },
+                { nombre: 'Google Pixel 8', marca: 'Google', precio: 699, stock: 15, almacenamiento: '128 GB', pantalla: '6.3"', color: 'Azul', imagen: 'https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png', descripcion: 'Experiencia Android pura con IA avanzada.', oferta: false },
+                { nombre: 'Motorola Edge 40', marca: 'Motorola', precio: 499, stock: 40, almacenamiento: '256 GB', pantalla: '6.5"', color: 'Negro', imagen: 'https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png', descripcion: 'Rendimiento y estilo a excelente precio.', oferta: false }
+            ];
+        }
+
+        function getProducts() {
+            const products = localStorage.getItem('cellstore_products');
+            if (!products) {
+                localStorage.setItem('cellstore_products', JSON.stringify(getDefaultProducts()));
+                return getDefaultProducts();
+            }
+            return JSON.parse(products);
+        }
+
+        function saveProducts(products) {
+            localStorage.setItem('cellstore_products', JSON.stringify(products));
+            renderProducts();
+        }
+
+        function renderProducts(filter = '') {
+            const products = getProducts();
+            const tbody = document.getElementById('productsBody');
+            const filtered = products.filter(p => p.nombre.toLowerCase().includes(filter.toLowerCase()));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-products">No se encontraron productos</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((p, i) => {
+                const realIndex = products.indexOf(p);
+                return `
+                    <tr>
+                        <td><img src="${p.imagen || ''}" alt="${p.nombre}" class="admin-img"></td>
+                        <td><strong>${p.nombre}</strong></td>
+                        <td>${p.marca}</td>
+                        <td>$${p.precio}</td>
+                        <td>${p.stock}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editProduct(${realIndex})">Editar</button>
+                            <button class="btn-delete" onclick="deleteProduct(${realIndex})">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterProducts() {
+            const search = document.getElementById('searchProducts').value;
+            renderProducts(search);
+        }
+
+        function editProduct(index) {
+            const products = getProducts();
+            const p = products[index];
+            document.getElementById('editIndex').value = index;
+            document.getElementById('formTitle').textContent = 'Editar Producto';
+            document.getElementById('prodNombre').value = p.nombre;
+            document.getElementById('prodMarca').value = p.marca;
+            document.getElementById('prodPrecio').value = p.precio;
+            document.getElementById('prodStock').value = p.stock;
+            document.getElementById('prodAlmacenamiento').value = p.almacenamiento;
+            document.getElementById('prodPantalla').value = p.pantalla;
+            document.getElementById('prodColor').value = p.color;
+            document.getElementById('prodImagen').value = p.imagen || '';
+            document.getElementById('prodDescripcion').value = p.descripcion;
+            document.getElementById('prodOferta').checked = p.oferta || false;
+            showSection('add-product');
+            document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.admin-nav-btn')[1].classList.add('active');
+        }
+
+        function deleteProduct(index) {
+            if (confirm('¿Estás seguro de eliminar este producto?')) {
+                const products = getProducts();
+                products.splice(index, 1);
+                saveProducts(products);
+            }
+        }
+
+        function saveProduct(event) {
+            event.preventDefault();
+            const products = getProducts();
+            const index = parseInt(document.getElementById('editIndex').value);
+
+            const product = {
+                nombre: document.getElementById('prodNombre').value,
+                marca: document.getElementById('prodMarca').value,
+                precio: parseFloat(document.getElementById('prodPrecio').value),
+                stock: parseInt(document.getElementById('prodStock').value),
+                almacenamiento: document.getElementById('prodAlmacenamiento').value,
+                pantalla: document.getElementById('prodPantalla').value,
+                color: document.getElementById('prodColor').value,
+                imagen: document.getElementById('prodImagen').value,
+                descripcion: document.getElementById('prodDescripcion').value,
+                oferta: document.getElementById('prodOferta').checked
+            };
+
+            if (index >= 0) {
+                products[index] = product;
+            } else {
+                products.push(product);
+            }
+
+            saveProducts(products);
+            resetForm();
+            showSection('products');
+            document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.admin-nav-btn')[0].classList.add('active');
+        }
+
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('editIndex').value = -1;
+            document.getElementById('formTitle').textContent = 'Agregar Nuevo Producto';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('cellstore_admin') !== 'true') {
+                window.location.href = 'login.html';
+            }
+            renderProducts();
+        });
+    </script>
+</body>
+</html>
