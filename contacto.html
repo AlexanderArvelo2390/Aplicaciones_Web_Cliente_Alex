@@ -103,25 +103,6 @@
         <p>Dirección: Calle Principal #123, Ciudad</p>
         <p>&copy; 2026 CellStore. Todos los derechos reservados.</p>
     </footer>
-    <script>
-        function toggleMenu() {
-            document.getElementById('mainNav').classList.toggle('active');
-        }
-
-        function getCart() {
-            return JSON.parse(localStorage.getItem('cellstore_cart') || '[]');
-        }
-
-        function updateCartCount() {
-            const cart = getCart();
-            const total = cart.reduce((sum, item) => sum + item.qty, 0);
-            const countEl = document.getElementById('cart-count');
-            if (countEl) {
-                countEl.textContent = `(${total})`;
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', updateCartCount);
-    </script>
+    <script src="js/script.js"></script>
 </body>
 </html>
