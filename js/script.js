@@ -931,11 +931,104 @@ function resetForm() {
   }
 }
 
+// ==================== FUNCIONES PARA GALERÍA HOME ====================
+
+function saveHeroImage(heroNumber) {
+  try {
+    const urlInput = document.getElementById(`heroUrl${heroNumber}`);
+    const preview = document.getElementById(`heroPreview${heroNumber}`);
+
+    if (!urlInput.value.trim()) {
+      showErrorMessage("Por favor ingresa una URL válida");
+      return;
+    }
+
+    // Validar que sea una URL válida
+    try {
+      new URL(urlInput.value);
+    } catch (e) {
+      showErrorMessage("URL inválida");
+      return;
+    }
+
+    // Guardar en localStorage
+    localStorage.setItem(`cellstore_hero${heroNumber}`, urlInput.value);
+
+    // Actualizar preview
+    preview.src = urlInput.value;
+    preview.onerror = function () {
+      showErrorMessage("No se pudo cargar la imagen. Verifica la URL.");
+      preview.src = urlInput.value; // Mantener la anterior
+    };
+
+    showSuccessMessage(`Imagen Hero ${heroNumber} guardada correctamente`);
+  } catch (error) {
+    console.error("Error al guardar imagen:", error);
+    showErrorMessage("Error al guardar la imagen");
+  }
+}
+
+function resetGalleryToDefaults() {
+  if (
+    confirm("¿Estás seguro de que deseas restaurar las imágenes por defecto?")
+  ) {
+    localStorage.removeItem("cellstore_hero1");
+    localStorage.removeItem("cellstore_hero2");
+
+    document.getElementById("heroUrl1").value =
+      "https://tiendaonline.movistar.com.ar/media/wysiwyg/home/movistar/CF_abril-d.jpg";
+    document.getElementById("heroUrl2").value =
+      "https://tiendaonline.movistar.com.ar/media/wysiwyg/home/movistar/otono164-d.jpg";
+
+    document.getElementById("heroPreview1").src =
+      "https://tiendaonline.movistar.com.ar/media/wysiwyg/home/movistar/CF_abril-d.jpg";
+    document.getElementById("heroPreview2").src =
+      "https://tiendaonline.movistar.com.ar/media/wysiwyg/home/movistar/otono164-d.jpg";
+
+    showSuccessMessage("Imágenes restauradas a valores por defecto");
+  }
+}
+
+function loadHeroImages() {
+  // Cargar imágenes guardadas en localStorage
+  const hero1Url =
+    localStorage.getItem("cellstore_hero1") ||
+    "https://tiendaonline.movistar.com.ar/media/wysiwyg/home/movistar/CF_abril-d.jpg";
+  const hero2Url =
+    localStorage.getItem("cellstore_hero2") ||
+    "https://tiendaonline.movistar.com.ar/media/wysiwyg/home/movistar/otono164-d.jpg";
+
+  // Aplicar a las imágenes específicas del home
+  const hero1 = document.getElementById("hero1");
+  const hero2 = document.getElementById("hero2");
+
+  if (hero1) {
+    hero1.src = hero1Url;
+    hero1.onerror = function () {
+      this.src =
+        "https://tiendaonline.movistar.com.ar/media/wysiwyg/home/movistar/CF_abril-d.jpg";
+    };
+  }
+
+  if (hero2) {
+    hero2.src = hero2Url;
+    hero2.onerror = function () {
+      this.src =
+        "https://tiendaonline.movistar.com.ar/media/wysiwyg/home/movistar/otono164-d.jpg";
+    };
+  }
+}
+
 // ==================== INICIALIZACIÓN ====================
 
 document.addEventListener("DOMContentLoaded", () => {
   // Actualizar carrito en todas las páginas
   updateCartCount();
+
+  // Cargar imágenes hero del home
+  if (document.getElementById("hero1") || document.getElementById("hero2")) {
+    loadHeroImages();
+  }
 
   // Para página de índice - cargar productos de Supabase
   if (document.getElementById("productosDestacados")) {
