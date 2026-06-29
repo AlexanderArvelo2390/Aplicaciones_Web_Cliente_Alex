@@ -21,6 +21,7 @@
             <nav class=" nav">
                 <ul>
                     <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
                     <li><a href="contacto.html">Contacto</a></li>
                     
                     <li><a href="carrito.html" class="cart-link">
@@ -32,7 +33,7 @@
                         Admin
                     </a></li>
                             <div class="search-container">
-                <input type="search" placeholder="Buscar productos...">
+                <input type="search" id="searchInput" placeholder="Buscar productos...">
                 <button type="button">Buscar</button>
             </div>
                 </ul>
@@ -46,72 +47,15 @@
 
     <main class="product-page">
         <div class="product-layout">
-            <aside class="filters-panel">
-                <h3>Filtros</h3>
-                <div class="filter-group">
-                    <h4>Marca</h4>
-                    <label><input type="checkbox" value="apple"> Apple</label>
-                    <label><input type="checkbox" value="samsung"> Samsung</label>
-                    <label><input type="checkbox" value="google"> Google</label>
-                    <label><input type="checkbox" value="motorola"> Motorola</label>
-                    <label><input type="checkbox" value="xiaomi"> Xiaomi</label>
-                    <label><input type="checkbox" value="huawei"> Huawei</label>
-                </div>
-                <div class="filter-group">
-                    <h4>Precio</h4>
-                    <div class="price-inputs">
-                        <input type="number" placeholder="Min" min="0">
-                        <span>-</span>
-                        <input type="number" placeholder="Max" min="0">
-                    </div>
-                    <input type="range" min="0" max="2000" step="50">
-                    <div class="price-labels">
-                        <span>$0</span>
-                        <span>$2000</span>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <h4>Almacenamiento</h4>
-                    <label><input type="checkbox" value="64gb"> 64 GB</label>
-                    <label><input type="checkbox" value="128gb"> 128 GB</label>
-                    <label><input type="checkbox" value="256gb"> 256 GB</label>
-                    <label><input type="checkbox" value="512gb"> 512 GB</label>
-                    <label><input type="checkbox" value="1tb"> 1 TB</label>
-                </div>
-                <div class="filter-group">
-                    <h4>Tamaño de Pantalla</h4>
-                    <label><input type="checkbox" value="small"> Menos de 6"</label>
-                    <label><input type="checkbox" value="medium"> 6" - 6.5"</label>
-                    <label><input type="checkbox" value="large"> Más de 6.5"</label>
-                </div>
-                <div class="filter-group">
-                    <h4>Color</h4>
-                    <div class="color-options">
-                        <span class="color-swatch" style="background-color: #000;" title="Negro"></span>
-                        <span class="color-swatch" style="background-color: #fff; border: 1px solid #ddd;" title="Blanco"></span>
-                        <span class="color-swatch" style="background-color: #3b82f6;" title="Azul"></span>
-                        <span class="color-swatch" style="background-color: #22c55e;" title="Verde"></span>
-                        <span class="color-swatch" style="background-color: #a855f7;" title="Morado"></span>
-                        <span class="color-swatch" style="background-color: #f59e0b;" title="Dorado"></span>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <h4>Ofertas</h4>
-                    <label><input type="checkbox" value="oferta"> Solo ofertas</label>
-                </div>
-                <button class="filter-apply">Aplicar Filtros</button>
-                <button class="filter-clear">Limpiar Filtros</button>
-            </aside>
+    
 
             <div class="product-detail">
-                <nav class="breadcrumb">
-                    <a href="index.html">Inicio</a> / <a href="#">Productos</a> / <span>Samsung Galaxy S24</span>
-                </nav>
+           
 
                 <div class="product-main">
                     <div class="product-images">
                         <div class="main-image">
-                            <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Samsung Galaxy S24" id="mainImage">
+                            <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Producto" id="mainImage">
                         </div>
                         <div class="thumbnail-list">
                             <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Vista 1" class="thumbnail active" onclick="changeImage(this)">
@@ -122,18 +66,16 @@
                     </div>
 
                     <div class="product-info">
-                        <span class="product-badge">Nuevo</span>
-                        <h2>Samsung Galaxy S24</h2>
+                        <span class="product-badge" id="productBadge">Nuevo</span>
+                        <h2 id="productName">Cargando...</h2>
                         <div class="product-rating">
                             <span class="stars">★★★★★</span>
                             <span class="review-count">(128 reseñas)</span>
                         </div>
                         <div class="product-price">
-                            <span class="current-price">$899</span>
-                            <span class="original-price">$1099</span>
-                            <span class="discount-tag">-18%</span>
+                            <span class="current-price" id="productPrice">$0</span>
                         </div>
-                        <p class="product-short-desc">El Samsung Galaxy S24 combina rendimiento y estilo en un diseño elegante. Con procesador de última generación, cámara de 50MP y batería de larga duración.</p>
+                        <p class="product-short-desc" id="productShortDesc"></p>
 
                         <div class="product-options">
                             <div class="option-group">
@@ -154,9 +96,9 @@
                             <div class="option-group">
                                 <label>Cantidad:</label>
                                 <div class="qty-selector">
-                                    <button onclick="changeQty(-1)">−</button>
+                                    <button onclick="changeProductQty(-1)">−</button>
                                     <input type="number" value="1" min="1" max="10" id="productQty">
-                                    <button onclick="changeQty(1)">+</button>
+                                    <button onclick="changeProductQty(1)">+</button>
                                 </div>
                             </div>
                         </div>
@@ -166,7 +108,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                                 Agregar al Carrito
                             </button>
-                            <button class="btn-buy-now">Comprar Ahora</button>
+                            <button class="btn-buy-now" id="buyNowBtn">Comprar Ahora</button>
                         </div>
 
                         <div class="product-features">
@@ -194,16 +136,7 @@
                     </div>
                     <div class="tab-content" id="tab-desc">
                         <h3>Descripción del Producto</h3>
-                        <p>El Samsung Galaxy S24 es el smartphone más avanzado de Samsung, diseñado para ofrecer una experiencia móvil excepcional. Con su pantalla Dynamic AMOLED de 6.2 pulgadas, disfrutarás de colores vibrantes y negros profundos.</p>
-                        <p>Su procesador Snapdragon 8 Gen 3 garantiza un rendimiento fluido en cualquier tarea, desde juegos hasta multitarea. La cámara principal de 50MP captura fotos impresionantes en cualquier condición de luz.</p>
-                        <ul>
-                            <li>Pantalla Dynamic AMOLED 2X de 6.2"</li>
-                            <li>Procesador Snapdragon 8 Gen 3</li>
-                            <li>Cámara triple: 50MP + 12MP + 10MP</li>
-                            <li>Batería de 4000mAh con carga rápida</li>
-                            <li>Resistencia al agua y polvo IP68</li>
-                            <li>5G integrado</li>
-                        </ul>
+                        <div id="productDescription"><p>Cargando...</p></div>
                     </div>
                     <div class="tab-content hidden" id="tab-specs">
                         <h3>Especificaciones Técnicas</h3>
@@ -226,51 +159,28 @@
                     </div>
                     <div class="tab-content hidden" id="tab-reviews">
                         <h3>Reseñas de Clientes</h3>
-                        <div class="review-item">
-                            <div class="review-header">
-                                <strong>María G.</strong>
-                                <span class="review-stars">★★★★★</span>
-                                <span class="review-date">15/01/2026</span>
-                            </div>
-                            <p>Excelente teléfono, la cámara es increíble y la batería dura todo el día. Muy recomendable.</p>
-                        </div>
-                        <div class="review-item">
-                            <div class="review-header">
-                                <strong>Carlos R.</strong>
-                                <span class="review-stars">★★★★☆</span>
-                                <span class="review-date">10/01/2026</span>
-                            </div>
-                            <p>Buen rendimiento y pantalla espectacular. Le doy 4 estrellas porque me hubiera gustado más almacenamiento base.</p>
-                        </div>
-                        <div class="review-item">
-                            <div class="review-header">
-                                <strong>Ana L.</strong>
-                                <span class="review-stars">★★★★★</span>
-                                <span class="review-date">05/01/2026</span>
-                            </div>
-                            <p>El mejor celular que tuve. Rápido, elegante y la calidad de fotos es impresionante.</p>
-                        </div>
+                        <div id="reviewsContainer"><p>Cargando reseñas...</p></div>
                     </div>
                 </div>
 
                 <section class="related-products">
                     <h3>Productos Relacionados</h3>
                     <div class="productos-grid">
-                        <a href="producto.html" class="producto-card">
+                        <a href="producto.html?id=fallback-1" class="producto-card">
                             <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="iPhone 15 Pro">
                             <h3>iPhone 15 Pro</h3>
                             <p class="precio">$999</p>
                             <p>Apple, 256GB, Pantalla 6.1"</p>
                             <button>Agregar al carrito</button>
                         </a>
-                        <a href="producto.html" class="producto-card">
+                        <a href="producto.html?id=fallback-3" class="producto-card">
                             <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Google Pixel 8">
                             <h3>Google Pixel 8</h3>
                             <p class="precio">$699</p>
                             <p>Google, 128GB, Pantalla 6.3"</p>
                             <button>Agregar al carrito</button>
                         </a>
-                        <a href="producto.html" class="producto-card">
+                        <a href="producto.html?id=fallback-4" class="producto-card">
                             <img src="https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png" alt="Motorola Edge 40">
                             <h3>Motorola Edge 40</h3>
                             <p class="precio">$499</p>
@@ -289,6 +199,9 @@
         <p>&copy; 2026 CellStore. Todos los derechos reservados.</p>
     </footer>
 
+    <script src="js/config.js"></script>
+    <script src="js/seed-products.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/product-detail.js"></script>
 </body>
 </html>

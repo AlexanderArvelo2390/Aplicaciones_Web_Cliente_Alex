@@ -98,4 +98,30 @@ Verifica que los campos no sean null. El script ya hace validación, pero si per
 
 ---
 
+### 6. Tabla compras
+
+Crear la tabla `compras` en Supabase:
+
+```sql
+CREATE TABLE compras (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  nombre VARCHAR NOT NULL,
+  apellido VARCHAR NOT NULL,
+  dni VARCHAR NOT NULL,
+  producto_nombre VARCHAR NOT NULL,
+  producto_id BIGINT,
+  reseña TEXT NOT NULL,
+  estrellas INTEGER NOT NULL CHECK (estrellas >= 1 AND estrellas <= 5),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+ALTER TABLE compras ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Permitir lectura pública compras"
+ON compras FOR SELECT USING (true);
+
+CREATE POLICY "Permitir inserciones públicas compras"
+ON compras FOR INSERT WITH CHECK (true);
+```
+
 Si el problema persiste, comparte el error exacto de la consola (F12).

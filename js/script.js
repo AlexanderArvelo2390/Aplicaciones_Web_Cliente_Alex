@@ -1,24 +1,27 @@
-// ==================== CONFIGURACIÓN SUPABASE ====================
+// ==================== ESTADO GLOBAL ====================
 
-const SUPABASE_CONFIG = {
-  url: "https://zzpvzpoqaewzbcadsfol.supabase.co",
-  key: "sb_publishable_8IeQAHEHkj-pmIgpNLUJrA_MqeSn0DC",
-  table: "productos",
-};
+let products = [];
 
 // ==================== FUNCIONES PARA CARGAR PRODUCTOS EN INDEX ====================
 
 async function renderProductosEnIndex() {
   try {
-    const products = await getProductsFromSupabase();
+    products = await getProductsFromSupabase();
 
     // Cargar productos destacados
     const destacadosContainer = document.getElementById("productosDestacados");
     if (destacadosContainer && products.length > 0) {
-      const html = products
+      const savedDestacados = getHomeSection("destacados");
+      const toRender =
+        savedDestacados && savedDestacados.length > 0
+          ? products.filter((p) => savedDestacados.includes(String(p.id)))
+          : products;
+      // Fallback: si la selección guardada no coincide con ningún producto, mostrar todos
+      const finalDestacados = toRender.length > 0 ? toRender : products;
+      const html = finalDestacados
         .map(
           (p) => `
-        <a href="producto.html" class="producto-card">
+        <a href="producto.html?id=${p.id}" class="producto-card">
           <img src="${p.imagen || "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png"}" alt="${p.nombre}" width="200">
           <h3>${p.nombre}</h3>
           <p class="precio">$${p.precio}</p>
@@ -34,12 +37,21 @@ async function renderProductosEnIndex() {
     // Cargar productos en oferta
     const ofertasContainer = document.getElementById("productosOfertas");
     if (ofertasContainer) {
-      const ofertasFiltered = products.filter((p) => p.oferta === true);
-      if (ofertasFiltered.length > 0) {
-        const html = ofertasFiltered
+      const savedOfertas = getHomeSection("ofertas");
+      const ofertasFiltered =
+        savedOfertas && savedOfertas.length > 0
+          ? products.filter((p) => savedOfertas.includes(String(p.id)))
+          : products.filter((p) => p.oferta === true);
+      // Fallback: si la selección no coincide con ningún producto, usar oferta=true
+      const finalOfertas =
+        savedOfertas && savedOfertas.length > 0 && ofertasFiltered.length === 0
+          ? products.filter((p) => p.oferta === true)
+          : ofertasFiltered;
+      if (finalOfertas.length > 0) {
+        const html = finalOfertas
           .map(
             (p) => `
-          <a href="producto.html" class="producto-card">
+          <a href="producto.html?id=${p.id}" class="producto-card">
             <img src="${p.imagen || "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png"}" alt="${p.nombre}" width="200">
             <h3>${p.nombre}</h3>
             <p class="precio">$${p.precio}</p>
@@ -69,6 +81,16 @@ async function renderProductosEnIndex() {
         addToCart(name, price, details, img);
       });
     });
+
+    // Aplicar búsqueda pendiente si viene de ?search= en la URL
+    const searchParam = new URLSearchParams(window.location.search).get(
+      "search",
+    );
+    if (searchParam) {
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) searchInput.value = searchParam;
+      filterProductsOnIndex(searchParam);
+    }
   } catch (error) {
     console.error("Error al cargar productos:", error);
   }
@@ -77,6 +99,12 @@ async function renderProductosEnIndex() {
 // ==================== FUNCIONES DE SUPABASE ====================
 
 async function getProductsFromSupabase() {
+  // Productos de ejemplo siempre disponibles como base
+  const seedBase =
+    typeof SEED_PRODUCTS !== "undefined"
+      ? SEED_PRODUCTS.map((p, i) => ({ id: `seed-${i + 1}`, ...p }))
+      : [];
+
   try {
     const response = await fetch(
       `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=*`,
@@ -93,20 +121,28 @@ async function getProductsFromSupabase() {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Error al obtener productos. Status:", response.status);
-      console.error("Respuesta:", errorText);
       throw new Error(`Error ${response.status}: ${errorText}`);
     }
 
-    const products = await response.json();
-    console.log("Productos obtenidos de Supabase:", products);
-    return products || [];
+    const supabaseProducts = (await response.json()) || [];
+
+    // Evitar duplicados: si un nombre de seed ya existe en Supabase, no se agrega
+    const supabaseNames = new Set(
+      supabaseProducts.map((p) => p.nombre?.toLowerCase()),
+    );
+    const uniqueSeed = seedBase.filter(
+      (p) => !supabaseNames.has(p.nombre?.toLowerCase()),
+    );
+
+    return [...supabaseProducts, ...uniqueSeed];
   } catch (error) {
-    console.error("Error al obtener productos de Supabase:", error);
-    // Fallback a localStorage si Supabase falla
-    return getDefaultProducts();
+    console.error(
+      "Error al obtener productos de Supabase, usando productos de ejemplo:",
+      error,
+    );
+    return seedBase.length > 0 ? seedBase : getDefaultProducts();
   }
 }
-
 async function saveProductToSupabase(product) {
   try {
     // Validar datos antes de enviar
@@ -359,7 +395,7 @@ function renderCart() {
             <p>Subtotal: <strong>${formatPrice(subtotal)}</strong></p>
             <p>IVA (21%): <strong>${formatPrice(tax)}</strong></p>
             <p class="total">Total: <strong>${formatPrice(total)}</strong></p>
-            <button onclick="alert('¡Compra realizada con éxito!')">Finalizar Compra</button>
+            <button onclick="window.location.href='compra.html?from=carrito'" class="btn-primary">Finalizar Compra</button>
             <button class="clear-cart-btn" onclick="clearCart()">Vaciar Carrito</button>
         </div>
     `;
@@ -411,34 +447,6 @@ function changeProductQty(delta) {
     if (val < 1) val = 1;
     if (val > 10) val = 10;
     input.value = val;
-  }
-}
-
-function addProductToCart() {
-  const qty = parseInt(document.getElementById("productQty").value);
-  const cart = getCart();
-  const existing = cart.find((item) => item.name === "Samsung Galaxy S24");
-  if (existing) {
-    existing.qty += qty;
-  } else {
-    cart.push({
-      name: "Samsung Galaxy S24",
-      price: "$899",
-      details: 'Samsung, 128GB, Pantalla 6.2"',
-      img: "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png",
-      qty: qty,
-    });
-  }
-  saveCart(cart);
-  const btn = document.querySelector(".btn-add-cart");
-  if (btn) {
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = "✓ Agregado al carrito";
-    btn.style.backgroundColor = "#27ae60";
-    setTimeout(() => {
-      btn.innerHTML = originalHTML;
-      btn.style.backgroundColor = "";
-    }, 1500);
   }
 }
 
@@ -509,11 +517,16 @@ function showSection(sectionId) {
   if (event && event.target && event.target.closest(".admin-nav-btn")) {
     event.target.closest(".admin-nav-btn").classList.add("active");
   }
+  // Cargar datos de secciones del home al abrir esa pestaña
+  if (sectionId === "home-sections") {
+    renderHomeSections();
+  }
 }
 
 function getDefaultProducts() {
   return [
     {
+      id: "fallback-1",
       nombre: "iPhone 15 Pro",
       marca: "Apple",
       precio: 999,
@@ -527,6 +540,7 @@ function getDefaultProducts() {
       oferta: false,
     },
     {
+      id: "fallback-2",
       nombre: "Samsung Galaxy S24",
       marca: "Samsung",
       precio: 899,
@@ -540,6 +554,7 @@ function getDefaultProducts() {
       oferta: true,
     },
     {
+      id: "fallback-3",
       nombre: "Google Pixel 8",
       marca: "Google",
       precio: 699,
@@ -553,6 +568,7 @@ function getDefaultProducts() {
       oferta: false,
     },
     {
+      id: "fallback-4",
       nombre: "Motorola Edge 40",
       marca: "Motorola",
       precio: 499,
@@ -688,8 +704,8 @@ async function renderProductsFromSupabase(filter = "") {
                 <td>$${p.precio}</td>
                 <td>${p.stock}</td>
                 <td>
-                    <button class="btn-edit" onclick="editProductFromSupabase(${p.id})">Editar</button>
-                    <button class="btn-delete" onclick="deleteProductFromSupabaseUI(${p.id})">Eliminar</button>
+                    <button class="btn-edit" onclick="editProductFromSupabase('${p.id}')">Editar</button>
+                    <button class="btn-delete" onclick="deleteProductFromSupabaseUI('${p.id}')">Eliminar</button>
                 </td>
             </tr>
         `,
@@ -801,7 +817,7 @@ function editProduct(index) {
 async function editProductFromSupabase(productId) {
   try {
     const products = await getProductsFromSupabase();
-    const p = products.find((prod) => prod.id === productId);
+    const p = products.find((prod) => String(prod.id) === String(productId));
     if (!p) {
       throw new Error("Producto no encontrado");
     }
@@ -904,7 +920,8 @@ async function saveProductAsync(event) {
     };
 
     if (editId && editId !== "-1") {
-      product.id = parseInt(editId);
+      // Si el ID es numérico (Supabase), convertir; si es string (seed-N), mantener
+      product.id = /^\d+$/.test(editId) ? parseInt(editId) : editId;
     }
 
     await saveProductToSupabase(product);
@@ -1019,6 +1036,285 @@ function loadHeroImages() {
   }
 }
 
+// ==================== FUNCIONES DE PÁGINA PRODUCTOS ====================
+
+async function renderProductosPage() {
+  const grid = document.getElementById("productosGrid");
+  if (!grid) return;
+
+  grid.innerHTML =
+    '<p style="grid-column:1/-1;text-align:center;padding:2rem;">Cargando productos...</p>';
+  products = await getProductsFromSupabase();
+
+  // Leer parámetros de la URL
+  const params = new URLSearchParams(window.location.search);
+  const searchParam = params.get("search") || "";
+  const marcaParam = params.get("marca") || "";
+
+  if (searchParam) {
+    const el = document.getElementById("filtroTexto");
+    if (el) el.value = searchParam;
+  }
+  if (marcaParam) {
+    const el = document.getElementById("filtroMarca");
+    if (el) el.value = marcaParam;
+  }
+
+  aplicarFiltros();
+}
+
+function aplicarFiltros() {
+  const grid = document.getElementById("productosGrid");
+  if (!grid) return;
+
+  const DEFAULT_IMG =
+    "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png";
+  const q = (document.getElementById("filtroTexto")?.value || "")
+    .toLowerCase()
+    .trim();
+  const marca = document.getElementById("filtroMarca")?.value || "";
+  const soloOfertas = document.getElementById("filtroOferta")?.value === "true";
+  const orden = document.getElementById("filtroOrden")?.value || "";
+
+  let filtered = products.filter((p) => {
+    const matchQ =
+      !q ||
+      p.nombre?.toLowerCase().includes(q) ||
+      p.marca?.toLowerCase().includes(q) ||
+      p.descripcion?.toLowerCase().includes(q);
+    const matchMarca = !marca || p.marca === marca;
+    const matchOferta = !soloOfertas || p.oferta === true;
+    return matchQ && matchMarca && matchOferta;
+  });
+
+  if (orden === "precio-asc") filtered.sort((a, b) => a.precio - b.precio);
+  else if (orden === "precio-desc")
+    filtered.sort((a, b) => b.precio - a.precio);
+  else if (orden === "nombre-asc")
+    filtered.sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+  const countEl = document.getElementById("productosCount");
+  if (countEl)
+    countEl.textContent = `${filtered.length} producto${filtered.length !== 1 ? "s" : ""}`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML =
+      '<p style="grid-column:1/-1;text-align:center;padding:2rem;color:#666;">No se encontraron productos con esos filtros.</p>';
+    return;
+  }
+
+  grid.innerHTML = filtered
+    .map(
+      (p) => `
+      <a href="producto.html?id=${p.id}" class="producto-card">
+        <img src="${p.imagen || DEFAULT_IMG}" alt="${p.nombre}" width="200">
+        <h3>${p.nombre}</h3>
+        <p class="precio">$${p.precio}</p>
+        <p>${p.marca || ""}, ${p.almacenamiento || ""}, Pantalla ${p.pantalla || ""}</p>
+        <button>Agregar al carrito</button>
+      </a>`,
+    )
+    .join("");
+
+  grid.querySelectorAll(".producto-card button").forEach((btn) => {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const card = this.closest(".producto-card");
+      const name = card.querySelector("h3").textContent;
+      const price = card.querySelector(".precio").textContent;
+      const details = card.querySelectorAll("p")[1]?.textContent || "";
+      const img = card.querySelector("img").src;
+      addToCart(name, price, details, img);
+    });
+  });
+}
+
+function limpiarFiltros() {
+  const fields = ["filtroTexto", "filtroMarca", "filtroOferta", "filtroOrden"];
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+  aplicarFiltros();
+}
+
+// ==================== FUNCIÓN DE BÚSQUEDA ====================
+
+function initSearch() {
+  const searchInput = document.getElementById("searchInput");
+  const searchBtn = document.querySelector(".search-container button");
+
+  if (!searchInput) return;
+
+  const doSearch = () => {
+    const query = searchInput.value.trim();
+    if (!query) return;
+
+    const isProductosPage = document.getElementById("productosGrid") !== null;
+
+    if (isProductosPage) {
+      // Ya estamos en productos.html — sincronizar filtro y aplicar
+      const filtroTexto = document.getElementById("filtroTexto");
+      if (filtroTexto) filtroTexto.value = query;
+      aplicarFiltros();
+    } else {
+      window.location.href =
+        "productos.html?search=" + encodeURIComponent(query);
+    }
+  };
+
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") doSearch();
+  });
+
+  if (searchBtn) {
+    searchBtn.addEventListener("click", doSearch);
+  }
+}
+
+function filterProductsOnIndex(query) {
+  const cards = document.querySelectorAll(
+    "#productosDestacados .producto-card, #productosOfertas .producto-card",
+  );
+  const q = query.toLowerCase();
+  let visible = 0;
+  cards.forEach((card) => {
+    const name = card.querySelector("h3")?.textContent?.toLowerCase() || "";
+    const detail =
+      card.querySelectorAll("p")[1]?.textContent?.toLowerCase() || "";
+    const matches = name.includes(q) || detail.includes(q);
+    card.style.display = matches ? "" : "none";
+    if (matches) visible++;
+  });
+
+  // Mostrar mensaje si no hay resultados
+  const dest = document.getElementById("productosDestacados");
+  const existingMsg = document.getElementById("search-no-results");
+  if (existingMsg) existingMsg.remove();
+  if (visible === 0 && dest) {
+    dest.insertAdjacentHTML(
+      "afterend",
+      `<p id="search-no-results" style="text-align:center;padding:2rem;color:#666;">No se encontraron productos para "<strong>${query}</strong>"</p>`,
+    );
+  }
+}
+
+// ==================== GESTIÓN DE SECCIONES DEL HOME ====================
+
+function getHomeSection(section) {
+  const data = localStorage.getItem(`cellstore_home_${section}`);
+  return data ? JSON.parse(data) : null; // null = comportamiento por defecto
+}
+
+function saveHomeSection(section, ids) {
+  if (ids.length === 0) {
+    localStorage.removeItem(`cellstore_home_${section}`);
+  } else {
+    localStorage.setItem(`cellstore_home_${section}`, JSON.stringify(ids));
+  }
+}
+
+function clearHomeSection(section) {
+  localStorage.removeItem(`cellstore_home_${section}`);
+  renderHomeSections();
+  showSuccessMessage("Sección restablecida a valores por defecto");
+}
+
+function switchHomeTab(tab) {
+  document
+    .querySelectorAll(".home-tab-btn")
+    .forEach((b) => b.classList.remove("active"));
+  document
+    .querySelectorAll(".home-tab-content")
+    .forEach((c) => c.classList.add("hidden"));
+
+  document.querySelectorAll(".home-tab-btn").forEach((b) => {
+    if (b.getAttribute("onclick") === `switchHomeTab('${tab}')`) {
+      b.classList.add("active");
+    }
+  });
+  const tabEl = document.getElementById(`home-tab-${tab}`);
+  if (tabEl) tabEl.classList.remove("hidden");
+}
+
+function toggleHomeSectionProduct(section, productId) {
+  const saved = getHomeSection(section) || [];
+  const strId = String(productId);
+  const idx = saved.indexOf(strId);
+  if (idx === -1) {
+    saved.push(strId);
+  } else {
+    saved.splice(idx, 1);
+  }
+  saveHomeSection(section, saved);
+
+  // Actualizar botón sin re-renderizar todo
+  const btn = document.querySelector(
+    `[data-section="${section}"][data-id="${strId}"]`,
+  );
+  if (btn) {
+    const isSelected = saved.includes(strId);
+    btn.textContent = isSelected ? "✓ Seleccionado" : "Agregar";
+    btn.classList.toggle("btn-selected", isSelected);
+    btn.closest(".home-product-item").classList.toggle("selected", isSelected);
+  }
+
+  // Actualizar contador
+  const key = section.charAt(0).toUpperCase() + section.slice(1);
+  const countEl = document.getElementById(`count${key}`);
+  if (countEl) countEl.textContent = saved.length;
+}
+
+async function renderHomeSections() {
+  const grid1 = document.getElementById("gridDestacados");
+  const grid2 = document.getElementById("gridOfertas");
+  if (!grid1 && !grid2) return;
+
+  if (grid1)
+    grid1.innerHTML =
+      '<p style="grid-column:1/-1;padding:1rem;">Cargando...</p>';
+  if (grid2)
+    grid2.innerHTML =
+      '<p style="grid-column:1/-1;padding:1rem;">Cargando...</p>';
+
+  const allProducts = await getProductsFromSupabase();
+  const savedDestacados = getHomeSection("destacados") || [];
+  const savedOfertas = getHomeSection("ofertas") || [];
+
+  const countDest = document.getElementById("countDestacados");
+  const countOf = document.getElementById("countOfertas");
+  if (countDest) countDest.textContent = savedDestacados.length;
+  if (countOf) countOf.textContent = savedOfertas.length;
+
+  const buildGrid = (grid, savedIds, section) => {
+    if (!grid) return;
+    grid.innerHTML = allProducts
+      .map((p) => {
+        const strId = String(p.id);
+        const isSelected = savedIds.includes(strId);
+        return `
+          <div class="home-product-item${isSelected ? " selected" : ""}">
+            <img src="${p.imagen || ""}" alt="${p.nombre}" onerror="this.style.opacity='0'">
+            <div class="home-product-info">
+              <strong>${p.nombre}</strong>
+              <span>$${p.precio} &middot; ${p.marca || ""}</span>
+            </div>
+            <button
+              class="btn-toggle-home${isSelected ? " btn-selected" : ""}"
+              data-section="${section}"
+              data-id="${strId}"
+              onclick="toggleHomeSectionProduct('${section}', '${strId}')"
+            >${isSelected ? "✓ Seleccionado" : "Agregar"}</button>
+          </div>`;
+      })
+      .join("");
+  };
+
+  buildGrid(grid1, savedDestacados, "destacados");
+  buildGrid(grid2, savedOfertas, "ofertas");
+}
+
 // ==================== INICIALIZACIÓN ====================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1035,18 +1331,16 @@ document.addEventListener("DOMContentLoaded", () => {
     renderProductosEnIndex();
   }
 
+  // Para página de productos
+  if (document.getElementById("productosGrid")) {
+    renderProductosPage();
+  }
+
   // Para página de admin
   if (localStorage.getItem("cellstore_admin") === "true") {
     const adminSection = document.getElementById("section-products");
     if (adminSection) {
-      // Cargar productos de Supabase
       renderProductsFromSupabase();
-
-      // Actualizar form de productos para usar Supabase
-      const productForm = document.getElementById("productForm");
-      if (productForm) {
-        productForm.onsubmit = saveProductAsync;
-      }
     }
   }
 
@@ -1068,4 +1362,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("cart-content")) {
     renderCart();
   }
+
+  // Inicializar búsqueda
+  initSearch();
 });

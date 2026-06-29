@@ -45,6 +45,10 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                         Galería Home
                     </button>
+                    <button class="admin-nav-btn" onclick="showSection('home-sections')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Secciones Home
+                    </button>
                     <button class="admin-nav-btn" onclick="showSection('settings')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                         Configuración
@@ -59,7 +63,7 @@
                         <button class="btn-primary" onclick="showSection('add-product')">+ Nuevo Producto</button>
                     </div>
                     <div class="admin-search">
-                        <input type="search" id="searchProducts" placeholder="Buscar productos..." oninput="filterProducts()">
+                        <input type="search" id="searchProducts" placeholder="Buscar productos..." oninput="filterProductsFromSupabase()">
                     </div>
                     <div class="products-table-container">
                         <table class="admin-table" id="productsTable">
@@ -83,7 +87,7 @@
                     <div class="section-header">
                         <h2 id="formTitle">Agregar Nuevo Producto</h2>
                     </div>
-                    <form id="productForm" class="admin-form" onsubmit="saveProduct(event)">
+                    <form id="productForm" class="admin-form" onsubmit="saveProductAsync(event)">
                         <input type="hidden" id="editIndex" value="-1">
                         <div class="form-row">
                             <div class="form-group">
@@ -201,6 +205,40 @@
                     </div>
                 </div>
 
+                <div class="section hidden" id="section-home-sections">
+                    <div class="section-header">
+                        <h2>Secciones del Home</h2>
+                    </div>
+                    <p class="section-description">Elige qué productos aparecen en cada sección de la página de inicio. Si no seleccionas ninguno, se usan los valores por defecto.</p>
+
+                    <div class="home-sections-tabs">
+                        <button class="home-tab-btn active" onclick="switchHomeTab('destacados')">⭐ Productos Destacados</button>
+                        <button class="home-tab-btn" onclick="switchHomeTab('ofertas')">🏷️ Ofertas Especiales</button>
+                    </div>
+
+                    <div id="home-tab-destacados" class="home-tab-content">
+                        <div class="home-section-info">
+                            <span>Seleccionados: <strong id="countDestacados">0</strong></span>
+                            <div class="home-section-actions">
+                                <small>Sin selección → se muestran todos los productos</small>
+                                <button class="btn-secondary" onclick="clearHomeSection('destacados')">Limpiar selección</button>
+                            </div>
+                        </div>
+                        <div id="gridDestacados" class="home-products-grid"><p>Cargando...</p></div>
+                    </div>
+
+                    <div id="home-tab-ofertas" class="home-tab-content hidden">
+                        <div class="home-section-info">
+                            <span>Seleccionados: <strong id="countOfertas">0</strong></span>
+                            <div class="home-section-actions">
+                                <small>Sin selección → se muestran productos con oferta=true</small>
+                                <button class="btn-secondary" onclick="clearHomeSection('ofertas')">Limpiar selección</button>
+                            </div>
+                        </div>
+                        <div id="gridOfertas" class="home-products-grid"><p>Cargando...</p></div>
+                    </div>
+                </div>
+
                 <div class="section hidden" id="section-settings">
                     <h2>Configuración</h2>
                     <div class="empty-state">
@@ -218,6 +256,8 @@
         <p>&copy; 2026 CellStore. Todos los derechos reservados.</p>
     </footer>
 
+    <script src="js/config.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/seed-products.js"></script>
 </body>
 </html>
