@@ -2278,6 +2278,18 @@ align-items: center;
     border-left: 4px solid #17a2b8;
 }
 
+.notification-loading {
+    top: 50% !important;
+    right: auto !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background-color: #007bff;
+    color: white;
+    border-left: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: none;
+}
+
 @media (max-width: 600px) {
     .notification {
         right: 10px;

@@ -783,13 +783,28 @@ async function renderProductsFromSupabase(filter = "") {
                 <td>$${p.precio}</td>
                 <td>${p.stock}</td>
                 <td>
-                    <button class="btn-edit" onclick="editProductFromSupabase('${p.id}')">Editar</button>
-                    <button class="btn-delete" onclick="deleteProductFromSupabaseUI('${p.id}')">Eliminar</button>
+                    <button class="btn-edit" data-product-id="${p.id}">Editar</button>
+                    <button class="btn-delete" data-product-id="${p.id}">Eliminar</button>
                 </td>
             </tr>
         `,
       )
       .join("");
+
+    // Agregar event listeners seguros
+    tbody.querySelectorAll(".btn-edit").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productId = btn.dataset.productId;
+        editProductFromSupabase(productId);
+      });
+    });
+
+    tbody.querySelectorAll(".btn-delete").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productId = btn.dataset.productId;
+        deleteProductFromSupabaseUI(productId);
+      });
+    });
   } catch (error) {
     console.error("Error al cargar productos:", error);
     document.getElementById("productsBody").innerHTML =
@@ -810,38 +825,20 @@ async function filterProductsFromSupabase() {
 // ==================== FUNCIONES DE MENSAJES ====================
 
 function showLoadingMessage(message = "Cargando...") {
+  // Remover mensaje anterior si existe
+  const existing = document.getElementById("loading-msg");
+  if (existing) existing.remove();
+
   const div = document.createElement("div");
   div.id = "loading-msg";
-  div.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #007bff;
-        color: white;
-        padding: 20px 40px;
-        border-radius: 8px;
-        z-index: 9999;
-        text-align: center;
-    `;
+  div.className = "notification notification-loading";
   div.textContent = message;
   document.body.appendChild(div);
 }
 
 function showSuccessMessage(message, duration = 3000) {
   const div = document.createElement("div");
-  div.id = "success-msg";
-  div.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #28a745;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        z-index: 9999;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    `;
+  div.className = "notification notification-success";
   div.textContent = message;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), duration);
@@ -849,18 +846,7 @@ function showSuccessMessage(message, duration = 3000) {
 
 function showErrorMessage(message, duration = 5000) {
   const div = document.createElement("div");
-  div.id = "error-msg";
-  div.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #dc3545;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        z-index: 9999;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    `;
+  div.className = "notification notification-error";
   div.textContent = message;
   document.body.appendChild(div);
   setTimeout(() => div.remove(), duration);
