@@ -6,23 +6,21 @@ let products = [];
 
 async function renderProductosEnIndex() {
   try {
+    console.log("🔄 Iniciando carga de productos...");
     products = await getProductsFromSupabase();
+    console.log("✓ Productos cargados:", products.length);
 
     // Cargar productos destacados
     const destacadosContainer = document.getElementById("productosDestacados");
-    if (destacadosContainer && products.length > 0) {
-      const savedDestacados = getHomeSection("destacados");
-      const toRender =
-        savedDestacados && savedDestacados.length > 0
-          ? products.filter((p) => savedDestacados.includes(String(p.id)))
-          : products;
-      // Fallback: si la selección guardada no coincide con ningún producto, mostrar todos
-      const finalDestacados = toRender.length > 0 ? toRender : products;
-      const html = finalDestacados
+    if (destacadosContainer) {
+      // Mostrar todos los productos si no hay selección guardada
+      const productosAMostrar = products.slice(0, 12); // Mostrar primeros 12
+
+      const html = productosAMostrar
         .map(
           (p) => `
         <a href="producto.html?id=${p.id}" class="producto-card">
-          <img src="${p.imagen || "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png"}" alt="${p.nombre}" width="200">
+          <img src="${p.imagen || "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png"}" alt="${p.nombre}" width="200" style="width: 100%; height: auto;">
           <h3>${p.nombre}</h3>
           <p class="precio">$${p.precio}</p>
           <p>${p.marca || ""}, ${p.almacenamiento || ""}, Pantalla ${p.pantalla || ""}</p>
@@ -31,28 +29,28 @@ async function renderProductosEnIndex() {
       `,
         )
         .join("");
-      destacadosContainer.innerHTML = html;
+
+      if (html) {
+        destacadosContainer.innerHTML = html;
+        console.log("✓ Productos destacados renderizados");
+      } else {
+        destacadosContainer.innerHTML = "<p>No hay productos disponibles</p>";
+      }
+    } else {
+      console.warn("⚠ No se encontró el contenedor de productos destacados");
     }
 
-    // Cargar productos en oferta
+    // Cargar productos en oferta (aquellos con oferta=true)
     const ofertasContainer = document.getElementById("productosOfertas");
     if (ofertasContainer) {
-      const savedOfertas = getHomeSection("ofertas");
-      const ofertasFiltered =
-        savedOfertas && savedOfertas.length > 0
-          ? products.filter((p) => savedOfertas.includes(String(p.id)))
-          : products.filter((p) => p.oferta === true);
-      // Fallback: si la selección no coincide con ningún producto, usar oferta=true
-      const finalOfertas =
-        savedOfertas && savedOfertas.length > 0 && ofertasFiltered.length === 0
-          ? products.filter((p) => p.oferta === true)
-          : ofertasFiltered;
-      if (finalOfertas.length > 0) {
-        const html = finalOfertas
+      const productosEnOferta = products.filter((p) => p.oferta === true);
+
+      if (productosEnOferta.length > 0) {
+        const html = productosEnOferta
           .map(
             (p) => `
           <a href="producto.html?id=${p.id}" class="producto-card">
-            <img src="${p.imagen || "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png"}" alt="${p.nombre}" width="200">
+            <img src="${p.imagen || "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png"}" alt="${p.nombre}" width="200" style="width: 100%; height: auto;">
             <h3>${p.nombre}</h3>
             <p class="precio">$${p.precio}</p>
             <p>${p.marca || ""}, ${p.almacenamiento || ""}, Pantalla ${p.pantalla || ""}</p>
@@ -62,37 +60,38 @@ async function renderProductosEnIndex() {
           )
           .join("");
         ofertasContainer.innerHTML = html;
+        console.log("✓ Ofertas renderizadas");
       } else {
         ofertasContainer.innerHTML =
-          '<p style="grid-column: 1/-1; text-align: center;">No hay ofertas disponibles</p>';
+          '<p style="grid-column: 1/-1; text-align: center;">No hay ofertas disponibles en este momento</p>';
+        console.log("ℹ Sin ofertas activas");
       }
     }
 
-    // Agregar listeners a todos los botones después de renderizar
+    // Agregar listeners a botones de "Agregar al carrito"
     document.querySelectorAll(".producto-card button").forEach((btn) => {
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
         const card = this.closest(".producto-card");
-        const name = card.querySelector("h3").textContent;
-        const price = card.querySelector(".precio").textContent;
-        const details = card.querySelectorAll("p")[1]?.textContent || "";
-        const img = card.querySelector("img").src;
-        addToCart(name, price, details, img);
+        if (card) {
+          const name = card.querySelector("h3")?.textContent || "Producto";
+          const price = card.querySelector(".precio")?.textContent || "$0";
+          const details = card.querySelectorAll("p")[1]?.textContent || "";
+          const img = card.querySelector("img")?.src || "";
+          addToCart(name, price, details, img);
+        }
       });
     });
 
-    // Aplicar búsqueda pendiente si viene de ?search= en la URL
-    const searchParam = new URLSearchParams(window.location.search).get(
-      "search",
-    );
-    if (searchParam) {
-      const searchInput = document.getElementById("searchInput");
-      if (searchInput) searchInput.value = searchParam;
-      filterProductsOnIndex(searchParam);
-    }
+    console.log("✓ Renderizado completado");
   } catch (error) {
-    console.error("Error al cargar productos:", error);
+    console.error("❌ Error al cargar productos:", error);
+    const destacadosContainer = document.getElementById("productosDestacados");
+    if (destacadosContainer) {
+      destacadosContainer.innerHTML =
+        '<p style="color: red;">Error al cargar productos. Por favor recarga la página.</p>';
+    }
   }
 }
 
@@ -487,6 +486,14 @@ function handleLogin(event) {
 
   if (username === "admin" && password === "1234") {
     localStorage.setItem("cellstore_admin", "true");
+    localStorage.setItem(
+      "cellstore_user",
+      JSON.stringify({
+        nombre: "Administrador",
+        apellido: "",
+        correo: "admin@cellstore.com",
+      }),
+    );
     window.location.href = "admin.html";
   } else {
     if (errorEl) {
@@ -496,8 +503,141 @@ function handleLogin(event) {
   }
 }
 
+// ==================== FUNCIONES DE REGISTRO ====================
+
+async function handleRegister(event) {
+  event.preventDefault();
+  console.log("📝 Procesando registro...");
+
+  const nombre = document.getElementById("regNombre")?.value?.trim() || "";
+  const apellido = document.getElementById("regApellido")?.value?.trim() || "";
+  const dni = document.getElementById("regDni")?.value?.trim() || "";
+  const correo = document.getElementById("regCorreo")?.value?.trim() || "";
+  const errorEl = document.getElementById("registerError");
+
+  console.log("Datos:", { nombre, apellido, dni, correo });
+
+  // Validaciones
+  if (!nombre || !apellido || !dni || !correo) {
+    const msg = "Por favor completa todos los campos";
+    console.warn("⚠", msg);
+    if (errorEl) {
+      errorEl.textContent = msg;
+      errorEl.style.display = "block";
+    }
+    return;
+  }
+
+  if (!/^\d+$/.test(dni)) {
+    const msg = "El DNI solo puede contener números";
+    console.warn("⚠", msg);
+    if (errorEl) {
+      errorEl.textContent = msg;
+      errorEl.style.display = "block";
+    }
+    return;
+  }
+
+  if (!correo.includes("@")) {
+    const msg = "Por favor ingresa un correo válido";
+    console.warn("⚠", msg);
+    if (errorEl) {
+      errorEl.textContent = msg;
+      errorEl.style.display = "block";
+    }
+    return;
+  }
+
+  try {
+    console.log("🔄 Enviando a Supabase...");
+
+    // Guardar usuario en Supabase
+    const response = await fetch(
+      `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table3}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_CONFIG.key,
+          Authorization: `Bearer ${SUPABASE_CONFIG.key}`,
+        },
+        body: JSON.stringify({
+          nombre: nombre,
+          apellido: apellido,
+          dni: dni,
+          correo: correo,
+        }),
+      },
+    );
+
+    console.log("Respuesta de Supabase:", response.status);
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("Error en respuesta:", error);
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    console.log("✓ Usuario registrado en Supabase");
+
+    // Guardar en localStorage
+    localStorage.setItem(
+      "cellstore_user",
+      JSON.stringify({
+        nombre: nombre,
+        apellido: apellido,
+        correo: correo,
+      }),
+    );
+
+    // Mostrar mensaje de éxito
+    if (errorEl) {
+      errorEl.style.display = "none";
+    }
+
+    alert("¡Registro exitoso! Bienvenido a CellStore.");
+
+    // Limpiar formulario
+    document.getElementById("registerForm").reset();
+
+    // Redirigir al home
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 500);
+  } catch (error) {
+    console.error("❌ Error al registrar:", error);
+    if (errorEl) {
+      errorEl.textContent = "Error al registrar. Intenta nuevamente.";
+      errorEl.style.display = "block";
+    }
+  }
+}
+
+function showLoginForm() {
+  document.getElementById("loginForm").classList.add("form-active");
+  document.getElementById("loginForm").classList.remove("hidden-form");
+  document.getElementById("registerForm").classList.remove("form-active");
+  document.getElementById("registerForm").classList.add("hidden-form");
+  document.getElementById("tabLogin").classList.add("active");
+  document.getElementById("tabRegister").classList.remove("active");
+  document.getElementById("loginError").style.display = "none";
+  document.getElementById("registerError").style.display = "none";
+}
+
+function showRegisterForm() {
+  document.getElementById("registerForm").classList.add("form-active");
+  document.getElementById("registerForm").classList.remove("hidden-form");
+  document.getElementById("loginForm").classList.remove("form-active");
+  document.getElementById("loginForm").classList.add("hidden-form");
+  document.getElementById("tabRegister").classList.add("active");
+  document.getElementById("tabLogin").classList.remove("active");
+  document.getElementById("loginError").style.display = "none";
+  document.getElementById("registerError").style.display = "none";
+}
+
 function handleLogout() {
   localStorage.removeItem("cellstore_admin");
+  localStorage.removeItem("cellstore_user");
   window.location.href = "login.html";
 }
 
@@ -521,67 +661,6 @@ function showSection(sectionId) {
   if (sectionId === "home-sections") {
     renderHomeSections();
   }
-}
-
-function getDefaultProducts() {
-  return [
-    {
-      id: "fallback-1",
-      nombre: "iPhone 15 Pro",
-      marca: "Apple",
-      precio: 999,
-      stock: 25,
-      almacenamiento: "256 GB",
-      pantalla: '6.1"',
-      color: "Negro",
-      imagen:
-        "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png",
-      descripcion: "El último iPhone con chip A17 Pro y cámara de 48MP.",
-      oferta: false,
-    },
-    {
-      id: "fallback-2",
-      nombre: "Samsung Galaxy S24",
-      marca: "Samsung",
-      precio: 899,
-      stock: 30,
-      almacenamiento: "128 GB",
-      pantalla: '6.2"',
-      color: "Verde",
-      imagen:
-        "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png",
-      descripcion: "Smartphone premium con cámara de 50MP.",
-      oferta: true,
-    },
-    {
-      id: "fallback-3",
-      nombre: "Google Pixel 8",
-      marca: "Google",
-      precio: 699,
-      stock: 15,
-      almacenamiento: "128 GB",
-      pantalla: '6.3"',
-      color: "Azul",
-      imagen:
-        "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png",
-      descripcion: "Experiencia Android pura con IA avanzada.",
-      oferta: false,
-    },
-    {
-      id: "fallback-4",
-      nombre: "Motorola Edge 40",
-      marca: "Motorola",
-      precio: 499,
-      stock: 40,
-      almacenamiento: "256 GB",
-      pantalla: '6.5"',
-      color: "Negro",
-      imagen:
-        "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png",
-      descripcion: "Rendimiento y estilo a excelente precio.",
-      oferta: false,
-    },
-  ];
 }
 
 function getProducts() {
@@ -1317,7 +1396,81 @@ async function renderHomeSections() {
 
 // ==================== INICIALIZACIÓN ====================
 
+/**
+ * Mostrar nombre del usuario en el navbar
+ */
+function updateUserNavbar() {
+  const user = JSON.parse(localStorage.getItem("cellstore_user") || "null");
+  const loginLink = document.querySelector(".login-nav-link");
+
+  if (user && user.nombre && loginLink) {
+    loginLink.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      ${user.nombre}
+    `;
+    loginLink.style.background =
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+    loginLink.href = "#";
+    loginLink.onclick = (e) => {
+      e.preventDefault();
+      showUserMenu();
+    };
+  }
+}
+
+/**
+ * Mostrar menú del usuario
+ */
+function showUserMenu() {
+  const user = JSON.parse(localStorage.getItem("cellstore_user") || "null");
+  if (!user) return;
+
+  const existingMenu = document.getElementById("userDropdownMenu");
+  if (existingMenu) {
+    existingMenu.remove();
+    return;
+  }
+
+  const menu = document.createElement("div");
+  menu.id = "userDropdownMenu";
+  menu.className = "user-dropdown-menu";
+  menu.innerHTML = `
+    <div class="user-menu-header">
+      <strong>${user.nombre} ${user.apellido || ""}</strong>
+      <small>${user.correo || ""}</small>
+    </div>
+    <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid #e0e0e0;">
+    <a href="#" onclick="handleLogout(); return false;">Cerrar Sesión</a>
+  `;
+
+  document.body.appendChild(menu);
+
+  // Posicionar cerca del botón de login
+  const loginLink = document.querySelector(".login-nav-link");
+  if (loginLink) {
+    const rect = loginLink.getBoundingClientRect();
+    menu.style.top = rect.bottom + 5 + "px";
+    menu.style.right = "20px";
+  }
+
+  // Cerrar menú al hacer clic fuera
+  setTimeout(() => {
+    document.addEventListener("click", closeUserMenu, { once: true });
+  }, 100);
+}
+
+/**
+ * Cerrar menú del usuario
+ */
+function closeUserMenu() {
+  const menu = document.getElementById("userDropdownMenu");
+  if (menu) menu.remove();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  // Mostrar nombre del usuario en navbar
+  updateUserNavbar();
+
   // Actualizar carrito en todas las páginas
   updateCartCount();
 

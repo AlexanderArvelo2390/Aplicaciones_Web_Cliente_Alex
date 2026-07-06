@@ -5,4 +5,5 @@ const SUPABASE_CONFIG = {
   key: "sb_publishable_8IeQAHEHkj-pmIgpNLUJrA_MqeSn0DC",
   table: "productos",
   table2: "compras",
+  table3: "usuarios",
 };

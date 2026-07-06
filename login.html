@@ -53,14 +53,21 @@
                     <h2>Iniciar Sesión</h2>
                     <p>Accede al panel de administración</p>
                 </div>
-                <form id="loginForm" onsubmit="handleLogin(event)">
+                <!-- BOTONES PARA ALTERNAR ENTRE LOGIN Y REGISTRO -->
+                <div class="form-tabs">
+                    <button type="button" class="tab-btn active" id="tabLogin" onclick="showLoginForm()">Iniciar Sesión</button>
+                    <button type="button" class="tab-btn" id="tabRegister" onclick="showRegisterForm()">Registrarse</button>
+                </div>
+
+                <!-- FORMULARIO DE LOGIN -->
+                <form id="loginForm" onsubmit="handleLogin(event)" class="form-active">
                     <div class="form-group">
                         <label for="username">Usuario</label>
                         <input type="text" id="username" name="username" required placeholder="Ingresa tu usuario">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group  ">
                         <label for="password">Contraseña</label>
-                        <div class="password-input">
+                        <div class="password-input ">
                             <input type="password" id="password" name="password" required placeholder="Ingresa tu contraseña">
                             <button type="button" class="toggle-password" onclick="togglePassword()">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="eyeIcon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -75,6 +82,34 @@
                     <button type="submit" class="btn-login">Ingresar</button>
                     <div id="loginError" class="error-message"></div>
                 </form>
+
+                <!-- FORMULARIO DE REGISTRO -->
+                <form id="registerForm" onsubmit="handleRegister(event)" class="hidden-form">
+                    <div class="form-group">
+                        <label for="regNombre">Nombre</label>
+                        <input type="text" id="regNombre" required placeholder="Ej: Juan">
+                    </div>
+                    <div class="form-group">
+                        <label for="regApellido">Apellido</label>
+                        <input type="text" id="regApellido" required placeholder="Ej: Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label for="regDni">DNI</label>
+                        <input type="text" id="regDni" required placeholder="Ej: 12345678">
+                    </div>
+                    <div class="form-group">
+                        <label for="regCorreo">Correo</label>
+                        <input type="email" id="regCorreo" required placeholder="Ej: juan@ejemplo.com">
+                    </div>
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="terms" required> Acepto los términos y condiciones
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-login">Crear Cuenta</button>
+                    <div id="registerError" class="error-message"></div>
+                </form>
+
                 <div class="login-footer">
                     <p><strong>Usuario demo:</strong> admin | <strong>Contraseña:</strong> 1234</p>
                 </div>
