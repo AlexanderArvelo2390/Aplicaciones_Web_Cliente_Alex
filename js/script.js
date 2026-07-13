@@ -10,56 +10,24 @@ async function renderProductosEnIndex() {
     products = await getProductsFromSupabase();
     console.log("✓ Productos cargados:", products.length);
 
-    // Cargar productos destacados
+    // Cargar productos destacados con paginación
     const destacadosContainer = document.getElementById("productosDestacados");
     if (destacadosContainer) {
-      // Mostrar todos los productos si no hay selección guardada
-      const productosAMostrar = products.slice(0, 12); // Mostrar primeros 12
-
-      const html = productosAMostrar
-        .map(
-          (p) => `
-        <a href="producto.html?id=${p.id}" class="producto-card">
-          <img src="${p.imagen || "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png"}" alt="${p.nombre}" width="200" style="width: 100%; height: auto;">
-          <h3>${p.nombre}</h3>
-          <p class="precio">$${p.precio}</p>
-          <p>${p.marca || ""}, ${p.almacenamiento || ""}, Pantalla ${p.pantalla || ""}</p>
-          <button>Agregar al carrito</button>
-        </a>
-      `,
-        )
-        .join("");
-
-      if (html) {
-        destacadosContainer.innerHTML = html;
-        console.log("✓ Productos destacados renderizados");
-      } else {
-        destacadosContainer.innerHTML = "<p>No hay productos disponibles</p>";
-      }
+      paginationManagers.destacados = new Pagination(products, 12);
+      updatePaginatedContent("productosDestacados");
+      console.log("✓ Productos destacados renderizados");
     } else {
       console.warn("⚠ No se encontró el contenedor de productos destacados");
     }
 
-    // Cargar productos en oferta (aquellos con oferta=true)
+    // Cargar productos en oferta con paginación
     const ofertasContainer = document.getElementById("productosOfertas");
     if (ofertasContainer) {
       const productosEnOferta = products.filter((p) => p.oferta === true);
 
       if (productosEnOferta.length > 0) {
-        const html = productosEnOferta
-          .map(
-            (p) => `
-          <a href="producto.html?id=${p.id}" class="producto-card">
-            <img src="${p.imagen || "https://tienda.personal.com.ar/images/720/webp/Samsung-Galaxy-A07-Verde_1764179117200024927.png"}" alt="${p.nombre}" width="200" style="width: 100%; height: auto;">
-            <h3>${p.nombre}</h3>
-            <p class="precio">$${p.precio}</p>
-            <p>${p.marca || ""}, ${p.almacenamiento || ""}, Pantalla ${p.pantalla || ""}</p>
-            <button>Agregar al carrito</button>
-          </a>
-        `,
-          )
-          .join("");
-        ofertasContainer.innerHTML = html;
+        paginationManagers.ofertas = new Pagination(productosEnOferta, 12);
+        updatePaginatedContent("productosOfertas");
         console.log("✓ Ofertas renderizadas");
       } else {
         ofertasContainer.innerHTML =
@@ -67,22 +35,6 @@ async function renderProductosEnIndex() {
         console.log("ℹ Sin ofertas activas");
       }
     }
-
-    // Agregar listeners a botones de "Agregar al carrito"
-    document.querySelectorAll(".producto-card button").forEach((btn) => {
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const card = this.closest(".producto-card");
-        if (card) {
-          const name = card.querySelector("h3")?.textContent || "Producto";
-          const price = card.querySelector(".precio")?.textContent || "$0";
-          const details = card.querySelectorAll("p")[1]?.textContent || "";
-          const img = card.querySelector("img")?.src || "";
-          addToCart(name, price, details, img);
-        }
-      });
-    });
 
     console.log("✓ Renderizado completado");
   } catch (error) {
@@ -1165,34 +1117,15 @@ function aplicarFiltros() {
   if (filtered.length === 0) {
     grid.innerHTML =
       '<p style="grid-column:1/-1;text-align:center;padding:2rem;color:#666;">No se encontraron productos con esos filtros.</p>';
+    // Limpiar controles de paginación
+    const oldControls = document.getElementById("pagination-productosGrid");
+    if (oldControls) oldControls.remove();
     return;
   }
 
-  grid.innerHTML = filtered
-    .map(
-      (p) => `
-      <a href="producto.html?id=${p.id}" class="producto-card">
-        <img src="${p.imagen || DEFAULT_IMG}" alt="${p.nombre}" width="200">
-        <h3>${p.nombre}</h3>
-        <p class="precio">$${p.precio}</p>
-        <p>${p.marca || ""}, ${p.almacenamiento || ""}, Pantalla ${p.pantalla || ""}</p>
-        <button>Agregar al carrito</button>
-      </a>`,
-    )
-    .join("");
-
-  grid.querySelectorAll(".producto-card button").forEach((btn) => {
-    btn.addEventListener("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const card = this.closest(".producto-card");
-      const name = card.querySelector("h3").textContent;
-      const price = card.querySelector(".precio").textContent;
-      const details = card.querySelectorAll("p")[1]?.textContent || "";
-      const img = card.querySelector("img").src;
-      addToCart(name, price, details, img);
-    });
-  });
+  // Crear gestor de paginación
+  paginationManagers.productos = new Pagination(filtered, 12);
+  updatePaginatedContent("productosGrid");
 }
 
 function limpiarFiltros() {
@@ -1201,6 +1134,10 @@ function limpiarFiltros() {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
+  // Resetear paginación de productos
+  if (paginationManagers.productos) {
+    paginationManagers.productos.reset();
+  }
   aplicarFiltros();
 }
 
