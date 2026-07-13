@@ -609,6 +609,8 @@ a:hover {
    RESPONSIVE Y MEDIA QUERIES
 ========================== */
 @media (max-width: 1024px) {
+    
+
     .product-layout {
         flex-direction: column;
     }
@@ -623,11 +625,12 @@ a:hover {
     }
 
     .product-images {
-        width: 100%;
+        width: 50%;
     }
 
     .admin-layout {
-        flex-direction: column;
+       display:grid
+       
     }
 
     .admin-sidebar {
@@ -660,6 +663,7 @@ a:hover {
 }
 
 @media (max-width: 990px) {
+
     .menu-toggle {
         display: block;
     }
@@ -669,6 +673,9 @@ a:hover {
     justify-content: center;
     gap: 10px;
 }
+   .product-images {
+        width: 50%;
+    }
     .contacto-info {
         display: flex;
         flex-direction: column;
@@ -776,8 +783,19 @@ a:hover {
 }
 
 @media (max-width: 480px) {
+ 
+
+ 
+
     .main-image {
         padding: 1rem;
+    }
+       .product-images {
+        width: 30px;
+    }
+    
+    .thumbnail-list {
+        display: none;
     }
 
     .product-info h2 {
@@ -951,11 +969,13 @@ a:hover {
 }
 
 .product-images {
-    width: 400px;
+    width: auto;
     flex-shrink: 0;
 }
 
 .main-image {
+     display: flex;
+
     background: #f8f9fa;
     border-radius: 8px;
     padding: 2rem;
@@ -964,12 +984,13 @@ a:hover {
 }
 
 .main-image img {
-    max-width: 100%;
+    max-width: 50%;
     height: auto;
 }
 
 .thumbnail-list {
     display: flex;
+    width: auto;
     gap: 0.5rem;
 }
 
@@ -992,6 +1013,8 @@ a:hover {
 
 .product-info {
     flex: 1;
+   
+  
 }
 
 .product-badge {
@@ -1520,18 +1543,20 @@ a:hover {
 }
 
 .admin-layout {
-    display: flex;
+    display: grid;
     gap: 2rem;
 }
 
 .admin-sidebar {
+    display:grid;
+grid-template-rows: auto 1fr    ;
     width: 240px;
     flex-shrink: 0;
 }
 
 .admin-nav {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 0.5rem;
 }
 
@@ -1563,6 +1588,7 @@ a:hover {
 
 .admin-content {
     flex: 1;
+    min-width:300px ;
 }
 
 .section-header {
@@ -1975,6 +2001,11 @@ align-items: center;
     }
     .filtro-selects select {
         flex: 1;
+    }
+    
+    /* Ocultar thumbnails en pantallas pequeñas */
+    .thumbnail-list {
+        display: none;
     }
 }
 
