@@ -56,11 +56,11 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.6;
     color: var(--color-texto-negro);
-    background-color: var(--color-blanco);
-    
+   
 }
 main{
  min-height: 100vh;
+
 }
 
 /* ==========================
@@ -76,6 +76,7 @@ header {
     align-items: center;
     gap: 1rem;
     flex: 1;
+     background-image: linear-gradient(to top, rgb(85, 83, 83), rgb(243, 243, 239));
         
 }
 
@@ -87,6 +88,7 @@ header {
     justify-content: space-between;
     align-items: center;
     
+    
 }
 .marca{
      border: solid 3px #cf2e2e;
@@ -97,6 +99,7 @@ header {
     flex-direction: row;
     justify-content: center;
     width: 100%;
+   
    
 }
 
@@ -137,6 +140,12 @@ nav a {
     
    
 }
+.footer-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
 /* ==========================
    ELEMENTOS DE LA hero img 
 ========================== */
@@ -144,18 +153,30 @@ nav a {
     display: flex;
     flex-direction: column;
     text-align: center;
-    background-color: var(--color-gris-fondo-claro);
-
+     background-image: linear-gradient(to bottom, rgb(85, 83, 83), rgb(243, 243, 239));
+ border-radius:none;
+}
+.texto{
+    padding: 10px;
+}
+.section-box-hero{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+     background-image: linear-gradient(to bottom, rgb(85, 83, 83), rgb(243, 243, 239));
 }
 .box-img{
     display: flex;
    justify-content: center;
-    margin: 0;
-    padding: 10px;
+   width: 100%;
+  
+  
+     
 }
 .img-hero{
 max-width: 50%;
-border-radius: 20px;
+border-radius: 10px;
+ background-image: linear-gradient(to top, rgb(85, 83, 83), rgb(243, 243, 239));
 }
 /* ==========================
    ELEMENTOS DE LA NAV (CARRITO / LOGIN)
@@ -255,7 +276,8 @@ section {
     background-color: white;
     padding: 2rem;
     margin-bottom: 2rem;
-    border-radius: 8px;
+  
+    
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -405,12 +427,21 @@ form p {
    FOOTER
 ========================== */
 footer {
-    background-color: #2c3e50;
-    color: white;
+   background-image: linear-gradient(to top, rgb(85, 83, 83), rgb(243, 243, 239));
+    color: rgb(0, 0, 0);
     text-align: center;
+    text-decoration: none;
+
     padding: 2rem;
     margin-top: 2rem;
   
+}
+.footer-info{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
 }
 
 footer p {
@@ -611,10 +642,7 @@ a:hover {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     }
 
-    main {
-        padding: 0 1rem;
-         
-    }
+ 
 
     section {
         padding: 1.5rem;
@@ -635,6 +663,12 @@ a:hover {
     .menu-toggle {
         display: block;
     }
+    .footer-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
     .contacto-info {
         display: flex;
         flex-direction: column;
@@ -753,6 +787,12 @@ a:hover {
     .current-price {
         font-size: 1.5rem;
     }
+        .footer-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
 
     .admin-main {
         padding: 0 1rem;
@@ -1832,6 +1872,8 @@ align-items: center;
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
+       
+       color:var(--color-negro, #333);
 }
 
 .productos-page-header {
@@ -2935,5 +2977,152 @@ align-items: center;
     }
     .chk-connector {
         max-width: 40px;
+    }
+}
+
+/* ==========================
+   PAGINACIÓN
+========================== */
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: var(--color-gris-fondo-claro);
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    background-color: var(--color-azul);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background-color: var(--color-azul-oscuro);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.pagination-btn:disabled {
+    background-color: var(--color-gris-deshabilitado);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pagination-prev {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.pagination-next {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.pagination-pages {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.pagination-number {
+    background-color: white;
+    color: var(--color-azul);
+    border: 2px solid var(--color-azul);
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 36px;
+    text-align: center;
+}
+
+.pagination-number:hover {
+    background-color: var(--color-azul);
+    color: white;
+    transform: scale(1.05);
+}
+
+.pagination-number.active {
+    background-color: var(--color-azul);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.4);
+}
+
+.pagination-info {
+    color: var(--color-gris-texto);
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 200px;
+    text-align: center;
+}
+
+/* Responsive paginación */
+@media (max-width: 768px) {
+    .pagination-controls {
+        gap: 0.8rem;
+        padding: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .pagination-number {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+        min-width: 32px;
+    }
+
+    .pagination-info {
+        font-size: 0.8rem;
+        min-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination-controls {
+        gap: 0.5rem;
+        flex-direction: column;
+    }
+
+    .pagination-btn {
+        width: 100%;
+        padding: 0.6rem;
+    }
+
+    .pagination-pages {
+        width: 100%;
+        gap: 0.3rem;
+    }
+
+    .pagination-number {
+        flex: 1;
+        min-width: auto;
+        font-size: 0.75rem;
+        padding: 0.4rem 0.4rem;
+    }
+
+    .pagination-info {
+        width: 100%;
+        min-width: auto;
+        font-size: 0.75rem;
     }
 }
